@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { ParcelInfo } from "@/components/parcel-info";
 
-const url = `${process.env.NEXT_PUBLIC_API_URL}/openai/assistant`;
+const url = `http://116.203.17.215:3005/api/openai/assistant`;
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
