@@ -418,14 +418,19 @@ export default function Home() {
 
           <div className="overflow-y-auto flex-1 px-1">
             <DialogDescription asChild>
-              <div>
-                <ParcelInfo data={modalData} />
-              </div>
+              <div>{modalData && <ParcelInfo data={modalData} />}</div>
             </DialogDescription>
           </div>
 
           <DialogFooter className="pt-4">
-            <Button onClick={() => setModalOpen(false)}>Close</Button>
+            <Button
+              onClick={() => {
+                setModalOpen(false);
+                setModalData(null);
+              }}
+            >
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
