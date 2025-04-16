@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Map, Info, Bot, LoaderCircle, Eraser } from "lucide-react";
+import {
+  Send,
+  Map,
+  Info,
+  Bot,
+  LoaderCircle,
+  Eraser,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -20,6 +28,15 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ParcelInfo } from "@/components/parcel-info";
 
 const url = `${process.env.NEXT_PUBLIC_API_URL}/openai/assistant`;
 
@@ -32,6 +49,8 @@ export default function Home() {
   const [thread, setThread] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<any>(null);
 
   useEffect(() => {
     getThread();
@@ -71,6 +90,12 @@ export default function Home() {
       setError(error.message);
     }
   };
+  const cleanChat = async () => {
+    setLoading(true);
+    await getThread();
+    setInput("");
+    setLoading(false);
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -95,12 +120,12 @@ export default function Home() {
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-purple-900 mb-2">
-            Explora Chipre
+            Explore Cyprus
           </h1>
           <p className="text-slate-600 max-w-2xl">
-            Descubre la belleza y la historia de Chipre, la tercera isla más
-            grande del Mar Mediterráneo, ubicada en la encrucijada de Europa,
-            Asia y África.
+            Discover the beauty and history of Cyprus, the third largest island
+            in the Mediterranean Sea, located at the crossroads of Europe, Asia
+            and Africa.
           </p>
         </header>
 
@@ -110,11 +135,9 @@ export default function Home() {
           <Card className="lg:col-span-2 shadow-md border-0">
             <CardHeader className="bg-purple-50 border-b">
               <CardTitle className="flex items-center text-purple-900">
-                <Map className="w-5 h-5 mr-2" /> Mapa de Chipre
+                <Map className="w-5 h-5 mr-2" /> Cyprus Map
               </CardTitle>
-              <CardDescription>
-                Espacio para embeber Google Maps
-              </CardDescription>
+              <CardDescription>Space to embed Google Maps</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
               <iframe
@@ -131,21 +154,21 @@ export default function Home() {
           <Card className="shadow-md border-0">
             <CardHeader className="bg-purple-50 border-b">
               <CardTitle className="flex items-center text-purple-900">
-                <Info className="w-5 h-5 mr-2" /> Información
+                <Info className="w-5 h-5 mr-2" /> Information
               </CardTitle>
-              <CardDescription>Datos interesantes sobre Chipre</CardDescription>
+              <CardDescription>Interesting facts about Cyprus</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
               <Tabs defaultValue="general" className="w-full">
                 <TabsList className="w-full grid grid-cols-3">
                   <TabsTrigger value="general">General</TabsTrigger>
-                  <TabsTrigger value="turismo">Turismo</TabsTrigger>
-                  <TabsTrigger value="cultura">Cultura</TabsTrigger>
+                  <TabsTrigger value="turismo">Tourism</TabsTrigger>
+                  <TabsTrigger value="cultura">Culture</TabsTrigger>
                 </TabsList>
                 <TabsContent value="general" className="p-4 space-y-4">
                   <div className="space-y-2">
                     <h3 className="font-medium text-purple-900">
-                      Datos Generales
+                      General Information
                     </h3>
                     <ul className="space-y-1 text-sm text-slate-700">
                       <li className="flex items-start">
@@ -153,83 +176,82 @@ export default function Home() {
                         Nicosia
                       </li>
                       <li className="flex items-start">
-                        <span className="font-semibold mr-2">Población:</span>{" "}
-                        Aprox. 1.2 millones
+                        <span className="font-semibold mr-2">Population:</span>{" "}
+                        Approx. 1.2 million
                       </li>
                       <li className="flex items-start">
-                        <span className="font-semibold mr-2">Idiomas:</span>{" "}
-                        Griego, Turco (oficiales)
+                        <span className="font-semibold mr-2">Languages:</span>{" "}
+                        Greek, Turkish (official)
                       </li>
                       <li className="flex items-start">
-                        <span className="font-semibold mr-2">Moneda:</span> Euro
-                        (€)
+                        <span className="font-semibold mr-2">Currency:</span>{" "}
+                        Euro (€)
                       </li>
                       <li className="flex items-start">
-                        <span className="font-semibold mr-2">Superficie:</span>{" "}
-                        9,251 km²
+                        <span className="font-semibold mr-2">Area:</span> 9,251
+                        km²
                       </li>
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-medium text-purple-900">Geografía</h3>
+                    <h3 className="font-medium text-purple-900">Geography</h3>
                     <p className="text-sm text-slate-700">
-                      Chipre está situada en el extremo oriental del Mar
-                      Mediterráneo, al sur de Turquía y al oeste de Siria y
-                      Líbano. La isla cuenta con dos cadenas montañosas: Troodos
-                      y Pentadaktylos.
+                      Cyprus is located in the eastern Mediterranean Sea, south
+                      of Turkey and west of Syria and Lebanon. The island has
+                      two mountain ranges: Troodos and Pentadaktylos.
                     </p>
                   </div>
                 </TabsContent>
                 <TabsContent value="turismo" className="p-4 space-y-4">
                   <div className="space-y-2">
                     <h3 className="font-medium text-purple-900">
-                      Destinos Populares
+                      Popular Destinations
                     </h3>
                     <ul className="space-y-1 text-sm text-slate-700">
                       <li className="flex items-start">
                         <span className="font-semibold mr-2">Ayia Napa:</span>{" "}
-                        Famosa por sus playas y vida nocturna
+                        Famous for its beaches and nightlife
                       </li>
                       <li className="flex items-start">
                         <span className="font-semibold mr-2">Paphos:</span>{" "}
-                        Sitio arqueológico Patrimonio de la UNESCO
+                        UNESCO World Heritage archaeological site
                       </li>
                       <li className="flex items-start">
                         <span className="font-semibold mr-2">Limassol:</span>{" "}
-                        Ciudad costera con castillo medieval
+                        Coastal city with medieval castle
                       </li>
                       <li className="flex items-start">
-                        <span className="font-semibold mr-2">Nicosia:</span> La
-                        última capital dividida de Europa
+                        <span className="font-semibold mr-2">Nicosia:</span> The
+                        last divided capital in Europe
                       </li>
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-medium text-purple-900">Actividades</h3>
+                    <h3 className="font-medium text-purple-900">Activities</h3>
                     <p className="text-sm text-slate-700">
-                      Chipre ofrece una gran variedad de actividades, desde
-                      buceo y deportes acuáticos hasta senderismo en las
-                      montañas Troodos y visitas a viñedos tradicionales.
+                      Cyprus offers a wide variety of activities, from diving
+                      and water sports to hiking in the Troodos mountains and
+                      visits to traditional vineyards.
                     </p>
                   </div>
                 </TabsContent>
                 <TabsContent value="cultura" className="p-4 space-y-4">
                   <div className="space-y-2">
-                    <h3 className="font-medium text-purple-900">Historia</h3>
+                    <h3 className="font-medium text-purple-900">History</h3>
                     <p className="text-sm text-slate-700">
-                      Con más de 10,000 años de historia, Chipre ha sido
-                      influenciada por muchas civilizaciones, incluyendo
-                      minoicos, micénicos, fenicios, asirios, egipcios, persas,
-                      romanos, bizantinos, cruzados, venecianos, otomanos y
-                      británicos.
+                      With over 10,000 years of history, Cyprus has been
+                      influenced by many civilizations, including Minoans,
+                      Mycenaeans, Phoenicians, Assyrians, Egyptians, Persians,
+                      Romans, Byzantines, Crusaders, Venetians, Ottomans and
+                      British.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-medium text-purple-900">Gastronomía</h3>
+                    <h3 className="font-medium text-purple-900">Gastronomy</h3>
                     <p className="text-sm text-slate-700">
-                      La cocina chipriota es una mezcla de influencias griegas y
-                      turcas. Platos típicos incluyen meze, souvlaki, halloumi
-                      (queso tradicional) y dulces como el baklava.
+                      Cypriot cuisine is a mix of Greek and Turkish influences.
+                      Typical dishes include meze, souvlaki, halloumi
+                      (traditional cheese) and sweets like baklava.
                     </p>
                   </div>
                 </TabsContent>
@@ -246,8 +268,8 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-600">
-                La capital y ciudad más grande de Chipre, dividida entre las
-                administraciones grecochipriota y turcochipriota.
+                The capital and largest city of Cyprus, divided between the
+                Greek Cypriot and Turkish Cypriot administrations.
               </p>
             </CardContent>
           </Card>
@@ -259,8 +281,8 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-600">
-                Principal puerto y centro turístico con un hermoso paseo
-                marítimo y un castillo medieval en el centro histórico.
+                Main port and tourist center with a beautiful promenade and a
+                medieval castle in the historic center.
               </p>
             </CardContent>
           </Card>
@@ -270,8 +292,8 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-600">
-                Ciudad costera con importantes yacimientos arqueológicos,
-                incluidos mosaicos romanos y las Tumbas de los Reyes.
+                Coastal city with important archaeological sites, including
+                Roman mosaics and the Tombs of the Kings.
               </p>
             </CardContent>
           </Card>
@@ -281,68 +303,96 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-600">
-                Ciudad portuaria con el principal aeropuerto internacional,
-                famosa por la iglesia de San Lázaro y el lago salado.
+                Port city with the main international airport, famous for the
+                Church of Saint Lazarus and the salt lake.
               </p>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Botón flotante para abrir el chat */}
+      {/* Floating button to open chat */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button
             className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-purple-600 hover:bg-purple-700"
-            aria-label="Abrir chat"
+            aria-label="Open chat"
           >
             <Bot className="h-12 w-12" />
           </Button>
         </SheetTrigger>
-        {/* Asegúrate de que SheetContent tenga una altura definida */}
+        {/* Make sure SheetContent has a defined height */}
         <SheetContent className="w-full sm:max-w-md p-0 flex flex-col h-full">
           <SheetHeader className="p-4 border-b">
             <SheetTitle>
-              Chat de IA sobre Chipre <Eraser />
+              Search Assistant
+              <Button
+                className="ml-2"
+                variant="ghost"
+                onClick={() => cleanChat()}
+                aria-label="Close"
+              >
+                <Eraser className="text-red-700" />
+              </Button>
             </SheetTitle>
           </SheetHeader>
 
-          {/* Este div debe ser flex y ocupar todo el espacio disponible */}
+          {/* This div should be flex and take up all available space */}
           <div className="flex flex-col flex-1 overflow-hidden">
-            {/* El área de mensajes debe tener flex-1 para expandirse y overflow-y-auto para scroll */}
+            {/* The message area should have flex-1 to expand and overflow-y-auto for scrolling */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center text-gray-500 my-8">
-                  <p>¡Hola! Te ayudaré en tu siguiente inmobiliario.</p>
+                  <p>Hello! I'll help you with your next real estate search.</p>
                 </div>
               )}
 
-              {messages.map((message: any, index: number) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
+              {messages.map((message: any, index: number) => {
+                return (
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user"
-                        ? "bg-purple-600 text-white"
-                        : "bg-gray-100 text-gray-800"
+                    key={index}
+                    className={`flex ${
+                      message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    {message.content.message}
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === "user"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {message.content.message}
+                      {message?.content?.data && (
+                        <div className="mt-2 pt-2 border-t border-gray-200">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs flex items-center gap-1 bg-white hover:bg-purple-50"
+                            onClick={() => {
+                              setModalOpen(true);
+                              setModalData(
+                                message.content.data?.propertyDetails || null
+                              );
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View detailed information
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* El formulario debe mantenerse en la parte inferior */}
+            {/* The form should stay at the bottom */}
             <form onSubmit={handleSubmit} className="border-t p-2 flex gap-2">
               <Input
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Preguntame algo..."
+                placeholder="Ask me something..."
                 className="flex-1"
               />
               <Button type="submit" size="icon" disabled={loading}>
@@ -359,6 +409,26 @@ export default function Home() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-md h-[500px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Location Details</DialogTitle>
+          </DialogHeader>
+
+          <div className="overflow-y-auto flex-1 px-1">
+            <DialogDescription asChild>
+              <div>
+                <ParcelInfo data={modalData} />
+              </div>
+            </DialogDescription>
+          </div>
+
+          <DialogFooter className="pt-4">
+            <Button onClick={() => setModalOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
