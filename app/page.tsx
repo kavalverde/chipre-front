@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { ParcelInfo } from "@/components/parcel-info";
 
-const url = `http://116.203.17.215:3005/api/openai/assistant`;
+const url = `https://geoia.umpacto.com/api/openai/assistant`;
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
