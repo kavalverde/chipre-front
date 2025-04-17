@@ -39,6 +39,7 @@ import {
 import { ParcelInfo } from "@/components/parcel-info";
 
 const url = `https://geoia.umpacto.com/api/openai/assistant`;
+//const url = `http://localhost:3005/api/openai/assistant`;
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
