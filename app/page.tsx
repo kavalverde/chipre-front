@@ -81,7 +81,7 @@ export default function Home() {
         url: `${url}/query`,
         data: {
           threadId: thread,
-          assistantId: "asst_DCmpV0IwvP9qPCf4Wa0aKnaX",
+          assistantId: "asst_yCVoVaCcrZ98xtAeclaGGGz7",
           question,
         },
       });
