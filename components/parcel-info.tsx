@@ -5,12 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { InfoIcon, MapPin, LandmarkIcon } from "lucide-react";
 
 interface ParcelInfoProps {
-  data: any;
+  data: any[];
 }
 
 export function ParcelInfo({ data }: ParcelInfoProps) {
-  // Validate that data exists and has the expected format
-  if (!data || !Array.isArray(data) || data.length < 8) {
+  // Validar que data existe y es un array
+  console.log("ParcelInfo data:", data);
+  if (!data || !Array.isArray(data) || data.length === 0) {
     return (
       <Alert>
         <InfoIcon className="h-4 w-4" />
@@ -21,17 +22,11 @@ export function ParcelInfo({ data }: ParcelInfoProps) {
     );
   }
 
-  // Extract data from the array
-  const [featuresArray, parcelNumber, x, y, _, plzone, priceBase1, priceBase2] =
-    data;
+  // Extraer el primer elemento del array
+  const parcelData = data[0];
 
-  // Validate that the first element is an array with at least one Feature object
-  const feature =
-    Array.isArray(featuresArray) && featuresArray.length > 0
-      ? featuresArray[0]
-      : null;
-
-  if (!feature || !feature.properties) {
+  // Validar que parcelData tiene las propiedades necesarias
+  if (!parcelData.properties) {
     return (
       <Alert>
         <InfoIcon className="h-4 w-4" />
@@ -42,14 +37,14 @@ export function ParcelInfo({ data }: ParcelInfoProps) {
     );
   }
 
-  const properties = feature.properties;
+  const properties = parcelData.properties;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold text-purple-900 flex items-center">
           <LandmarkIcon className="h-5 w-5 mr-2" />
-          Parcel {parcelNumber || properties.parcel_nbr || "N/A"}
+          Parcel {properties.parcel_nbr || "N/A"}
         </h3>
         <Badge variant="outline" className="bg-purple-50">
           {properties.vil_nm_e || "N/A"}
@@ -113,23 +108,25 @@ export function ParcelInfo({ data }: ParcelInfoProps) {
                 </dd>
 
                 <dt className="font-medium text-slate-700">Zone:</dt>
-                <dd>{plzone || properties.plzone || "N/A"}</dd>
+                <dd>{properties.plzone || "N/A"}</dd>
 
                 <dt className="font-medium text-slate-700">Coordinates:</dt>
                 <dd className="flex items-center">
                   <MapPin className="h-3 w-3 mr-1 text-purple-600" />
-                  {x && y ? `${x.toFixed(6)}, ${y.toFixed(6)}` : "N/A"}
+                  {properties.x && properties.y
+                    ? `${properties.x.toFixed(6)}, ${properties.y.toFixed(6)}`
+                    : "N/A"}
                 </dd>
               </dl>
             </CardContent>
           </Card>
 
-          {feature.geometry && (
+          {parcelData.geometry && (
             <div className="bg-slate-100 p-3 rounded-md">
               <p className="text-xs text-slate-500 mb-2">Parcel polygon:</p>
               <div className="bg-white p-2 rounded border border-slate-200 overflow-x-auto">
                 <pre className="text-xs text-slate-700">
-                  {JSON.stringify(feature.geometry.coordinates, null, 2)}
+                  {JSON.stringify(parcelData.geometry.coordinates, null, 2)}
                 </pre>
               </div>
             </div>
@@ -145,12 +142,12 @@ export function ParcelInfo({ data }: ParcelInfoProps) {
               <dl className="grid grid-cols-2 gap-2">
                 <dt className="font-medium text-slate-700">Base Price 1:</dt>
                 <dd className="font-semibold text-purple-700">
-                  {priceBase1 || properties.prc_price_base1 || "N/A"} €
+                  {properties.prc_price_base1 || "N/A"} €
                 </dd>
 
                 <dt className="font-medium text-slate-700">Base Price 2:</dt>
                 <dd className="font-semibold text-purple-700">
-                  {priceBase2 || properties.prc_price_base2 || "N/A"} €
+                  {properties.prc_price_base2 || "N/A"} €
                 </dd>
               </dl>
             </CardContent>

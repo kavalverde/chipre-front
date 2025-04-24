@@ -38,8 +38,8 @@ import {
 } from "@/components/ui/dialog";
 import { ParcelInfo } from "@/components/parcel-info";
 
-const url = `https://geoia.umpacto.com/api/openai/assistant`;
-//const url = `http://localhost:3005/api/openai/assistant`;
+//const url = `https://geoia.umpacto.com/api/openai/assistant`;
+const url = `http://localhost:3005/api/openai/assistant`;
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
@@ -372,9 +372,7 @@ export default function Home() {
                             className="text-xs flex items-center gap-1 bg-white hover:bg-purple-50"
                             onClick={() => {
                               setModalOpen(true);
-                              setModalData(
-                                message.content.data?.propertyDetails || null
-                              );
+                              setModalData(message.content.data || null);
                             }}
                           >
                             <ExternalLink className="h-3 w-3" />
